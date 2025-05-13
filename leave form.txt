@@ -1,0 +1,86 @@
+-- First, ensure the table is created (if it doesn't exist)
+CREATE TABLE IF NOT EXISTS LeaveApplications (
+    leave_request_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    employee_name TEXT NOT NULL,
+    employee_id TEXT NOT NULL,
+    employee_email TEXT NOT NULL,
+    leave_type TEXT NOT NULL CHECK (leave_type IN ('sick', 'casual', 'earned')),
+    from_date TEXT NOT NULL,   -- Store as 'YYYY-MM-DD'
+    to_date TEXT NOT NULL,     -- Store as 'YYYY-MM-DD'
+    from_time TEXT,            -- Store as 'HH:MM', NULLABLE
+    to_time TEXT,              -- Store as 'HH:MM', NULLABLE
+    reason TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
+    application_timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Optional: Create indexes if they don't exist
+CREATE INDEX IF NOT EXISTS idx_leave_employee_id ON LeaveApplications (employee_id);
+CREATE INDEX IF NOT EXISTS idx_leave_status ON LeaveApplications (status);
+CREATE INDEX IF NOT EXISTS idx_leave_dates ON LeaveApplications (from_date, to_date);
+CREATE INDEX IF NOT EXISTS idx_leave_employee_email ON LeaveApplications (employee_email);
+
+-- Now, let's insert some sample data
+
+-- Sample 1: Sick leave, single day with times, Pending
+INSERT INTO LeaveApplications (
+    employee_name, employee_id, employee_email, leave_type,
+    from_date, to_date, from_time, to_time, reason, status
+) VALUES (
+    'Alice Wonderland', 'ALW0101', 'alice.w@example.com', 'sick',
+    '2024-07-25', '2024-07-25', '09:00', '17:00', 'Feeling unwell, doctor''s appointment.', 'Pending'
+);
+
+-- Sample 2: Casual leave, multi-day, Approved
+INSERT INTO LeaveApplications (
+    employee_name, employee_id, employee_email, leave_type,
+    from_date, to_date, from_time, to_time, reason, status
+) VALUES (
+    'Bob The Builder', 'BTB0202', 'bob.b@example.com', 'casual',
+    '2024-08-05', '2024-08-07', NULL, NULL, 'Short vacation for family event.', 'Approved'
+);
+
+-- Sample 3: Earned leave, single day, Rejected
+INSERT INTO LeaveApplications (
+    employee_name, employee_id, employee_email, leave_type,
+    from_date, to_date, from_time, to_time, reason, status
+) VALUES (
+    'Charlie Brown', 'CHB0303', 'charlie.b@example.com', 'earned',
+    '2024-07-30', '2024-07-30', NULL, NULL, 'Personal errand, need a day off.', 'Rejected'
+);
+
+-- Sample 4: Casual leave, future, Pending, different employee
+INSERT INTO LeaveApplications (
+    employee_name, employee_id, employee_email, leave_type,
+    from_date, to_date, reason -- status will default to 'Pending'
+) VALUES (
+    'Diana Prince', 'DNP0404', 'diana.p@example.com', 'casual',
+    '2024-09-10', '2024-09-12', 'Attending a web development conference.'
+);
+
+-- Sample 5: Another Approved leave for Alice (historical)
+INSERT INTO LeaveApplications (
+    employee_name, employee_id, employee_email, leave_type,
+    from_date, to_date, from_time, to_time, reason, status
+) VALUES (
+    'Alice Wonderland', 'ALW0101', 'alice.w@example.com', 'earned',
+    '2023-12-20', '2023-12-22', NULL, NULL, 'Year-end family vacation.', 'Approved'
+);
+
+-- Sample 6: Sick leave, same day, different times, Pending for Bob
+INSERT INTO LeaveApplications (
+    employee_name, employee_id, employee_email, leave_type,
+    from_date, to_date, from_time, to_time, reason, status
+) VALUES (
+    'Bob The Builder', 'BTB0202', 'bob.b@example.com', 'sick',
+    '2024-08-15', '2024-08-15', '10:30', '14:30', 'Sudden fever, need to rest.', 'Pending'
+);
+
+-- Sample 7: Casual leave for Charlie, approved
+INSERT INTO LeaveApplications (
+    employee_name, employee_id, employee_email, leave_type,
+    from_date, to_date, from_time, to_time, reason, status
+) VALUES (
+    'Charlie Brown', 'CHB0303', 'charlie.b@example.com', 'casual',
+    '2024-10-01', '2024-10-02', NULL, NULL, 'Attending a friend''s wedding.', 'Approved'
+);

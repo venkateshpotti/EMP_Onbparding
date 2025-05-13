@@ -1,0 +1,85 @@
+CREATE TABLE IF NOT EXISTS wfh_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    employee_name TEXT NOT NULL,
+    employee_id_text TEXT NOT NULL,
+    email TEXT NOT NULL,
+    project TEXT,
+    manager TEXT,
+    wfh_location TEXT NOT NULL,
+    from_date TEXT NOT NULL,
+    to_date TEXT NOT NULL,
+    reason TEXT,
+    status TEXT NOT NULL DEFAULT 'pending',  -- Possible values: 'pending', 'approved', 'rejected'
+    submission_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    action_timestamp DATETIME NULL
+);
+
+INSERT INTO wfh_requests (
+    employee_name,
+    employee_id_text,
+    email,
+    project,
+    manager,
+    wfh_location,
+    from_date,
+    to_date,
+    reason
+) VALUES (
+    'Alice Wonderland',
+    'E12345',
+    'alice@example.com',
+    'Project Phoenix',
+    'Bob The Builder',
+    'Home Office - London',
+    '2023-11-15',  -- YYYY-MM-DD format
+    '2023-11-17',
+    'Need to focus on a critical deadline for Project Phoenix deliverables.'
+);
+
+
+INSERT INTO wfh_requests (
+    employee_name,
+    employee_id_text,
+    email,
+    wfh_location,
+    from_date,
+    to_date,
+    reason
+) VALUES (
+    'Charlie Brown',
+    'E67890',
+    'charlie@example.com',
+    'Client Site - Remote Setup',
+    '2023-11-20',
+    '2023-11-20',
+    'One-day remote work for client system configuration.'
+);
+
+
+INSERT INTO wfh_requests (
+    employee_name,
+    employee_id_text,
+    email,
+    project,
+    manager,
+    wfh_location,
+    from_date,
+    to_date,
+    reason,
+    status,
+    submission_timestamp, -- Specifying it for older data
+    action_timestamp      -- Specifying it because it's approved
+) VALUES (
+    'Diana Prince',
+    'E11223',
+    'diana@example.com',
+    'Special Assignment',
+    'Steve Trevor',
+    'Themyscira Island Office',
+    '2023-10-01',
+    '2023-10-05',
+    'Confidential mission requiring remote work.',
+    'approved',
+    '2023-09-28 09:30:00', -- Earlier submission
+    '2023-09-29 14:00:00'  -- When it was approved
+);

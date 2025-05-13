@@ -1,0 +1,62 @@
+-- Enable foreign key support (good practice)
+PRAGMA foreign_keys = ON;
+
+-- ==========================================================================
+-- Table: AllocatedWorkItems
+-- ==========================================================================
+CREATE TABLE IF NOT EXISTS AllocatedWorkItems (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    taskName TEXT NOT NULL,
+    project TEXT DEFAULT 'HRMS Portal',
+    assignedDate TEXT NOT NULL,
+    deadlineDate TEXT NOT NULL,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Trigger for AllocatedWorkItems
+CREATE TRIGGER IF NOT EXISTS UpdateAllocatedWorkItemTimestamp
+AFTER UPDATE ON AllocatedWorkItems
+FOR EACH ROW
+BEGIN
+    UPDATE AllocatedWorkItems SET updatedAt = CURRENT_TIMESTAMP WHERE id = OLD.id;
+END;
+
+-- Index for AllocatedWorkItems
+CREATE UNIQUE INDEX IF NOT EXISTS idx_allocatedworkitems_taskname ON AllocatedWorkItems(taskName);
+
+-- ==========================================================================
+-- Table: WorkSubmissions
+-- ==========================================================================
+CREATE TABLE IF NOT EXISTS WorkSubmissions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    submittedTaskName TEXT NOT NULL,
+    employeeName TEXT NOT NULL,
+    employeeId TEXT NOT NULL,
+    documentFileName TEXT,
+    submissionStatus TEXT NOT NULL CHECK(submissionStatus IN ('completed', 'inprocess')),
+    submissionTimestamp TEXT NOT NULL,
+    project TEXT DEFAULT 'HRMS Portal',
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index for WorkSubmissions
+CREATE INDEX IF NOT EXISTS idx_worksubmissions_employeeid ON WorkSubmissions(employeeId);
+
+-- ==========================================================================
+-- Insert Sample Data into AllocatedWorkItems
+-- ==========================================================================
+INSERT OR IGNORE INTO AllocatedWorkItems (taskName, project, assignedDate, deadlineDate) VALUES
+('Review Q3 Performance Metrics', 'HRMS Portal', '10/15/2023, 9:00:00 AM', '10/25/2023, 5:00:00 PM'),
+('Update Employee Onboarding Document', 'HRMS Portal', '10/18/2023, 11:00:00 AM', '11/01/2023, 5:00:00 PM'),
+('Prepare Q4 Training Schedule', 'HRMS Portal', '10/20/2023, 2:00:00 PM', '11/10/2023, 5:00:00 PM'),
+('Finalize Benefits Enrollment Process', 'HRMS Portal', '10/22/2023, 10:00:00 AM', '10/30/2023, 5:00:00 PM');
+
+-- ==========================================================================
+-- Insert Sample Data into WorkSubmissions
+-- ==========================================================================
+INSERT INTO WorkSubmissions (submittedTaskName, employeeName, employeeId, documentFileName, submissionStatus, submissionTimestamp, project) VALUES
+('Initial Draft of Performance Metrics', 'Alice Wonderland', 'ALW0001', 'Q3_Metrics_Draft_v1.pdf', 'inprocess', '10/18/2023, 3:30:45 PM', 'HRMS Portal'),
+('Employee Handbook Revisions', 'Bob The Builder', 'BTB1234', 'Handbook_Revisions_Bob.docx', 'completed', '10/19/2023, 10:15:22 AM', 'HRMS Portal'),
+('Q3 Performance Metrics - Final Report', 'Alice Wonderland', 'ALW0001', 'Q3_Metrics_Final.pdf', 'completed', '10/24/2023, 4:50:10 PM', 'HRMS Portal'),
+('Training Schedule Proposal', 'Carol Danvers', 'CDS7890', 'Q4_Training_Proposal.docx', 'inprocess', '10/26/2023, 11:05:00 AM', 'HRMS Portal');
